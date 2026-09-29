@@ -40,11 +40,11 @@ public class JsonExtractor
         var keyUser = ambiente.KeyUsers.FirstOrDefault(k => k.IsAct);
         if (keyUser == null)
         {
-            return new SyncResult { Success = false, Message = $"Ambiente con ID {idAmb} no encontrado." };
+            return new SyncResult { Success = false, Message = $"El ambiente '{ambiente.NamAmb}' no tiene un usuario de solicitud activo configurado." };
         }
 
-        var user = keyUser?.UsrNam;
-        var pass = keyUser?.UsrPass;
+        var user = keyUser.UsrNam;
+        var pass = keyUser.UsrPass;
         var baseUrl = ambiente.DirAmb;
 
         if (string.IsNullOrWhiteSpace(baseUrl))

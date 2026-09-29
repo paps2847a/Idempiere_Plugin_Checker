@@ -88,6 +88,8 @@
                         <th style="width: 70px;">ID</th>
                         <th>Nombre</th>
                         <th>URL Base (Endpoint)</th>
+                        <th>Lapso</th>
+                        <th>Última Sync</th>
                         <th>Plugins</th>
                         <th>Estado</th>
                         <th class="text-end" style="width: 220px;">Acciones</th>
@@ -103,6 +105,14 @@
                             </td>
                             <td>
                                 <code class="small text-secondary">@amb.DirAmb</code>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    <i class="bi bi-clock-history me-1 text-primary"></i> @amb.SyncIntervalMinutes min
+                                </span>
+                            </td>
+                            <td class="small text-muted">
+                                @(amb.LastSyncAt.HasValue ? amb.LastSyncAt.Value.ToString("dd/MM/yyyy HH:mm") : "Pendiente")
                             </td>
                             <td>
                                 <span class="badge bg-light text-dark border">

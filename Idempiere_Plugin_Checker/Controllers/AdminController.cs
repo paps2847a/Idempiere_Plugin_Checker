@@ -143,6 +143,7 @@ public class AdminController : Controller
             NamAmb = model.NamAmb.Trim(),
             DirAmb = model.DirAmb.Trim(),
             IsAct = model.IsAct,
+            SyncIntervalMinutes = model.SyncIntervalMinutes > 0 ? model.SyncIntervalMinutes : 5,
             RegDat = DateTime.Now
         };
 
@@ -168,7 +169,7 @@ public class AdminController : Controller
         }
 
         TempData["AdminSuccess"] = true;
-        TempData["AdminMessage"] = $"Ambiente '{ambiente.NamAmb}' creado exitosamente.";
+        TempData["AdminMessage"] = $"Ambiente '{ambiente.NamAmb}' creado exitosamente con lapso de sincronización de {ambiente.SyncIntervalMinutes} minutos.";
 
         return RedirectToAction(nameof(Index));
     }
@@ -188,7 +189,8 @@ public class AdminController : Controller
             IdAmb = ambiente.IdAmb,
             NamAmb = ambiente.NamAmb,
             DirAmb = ambiente.DirAmb,
-            IsAct = ambiente.IsAct
+            IsAct = ambiente.IsAct,
+            SyncIntervalMinutes = ambiente.SyncIntervalMinutes
         };
 
         return View(model);
@@ -213,11 +215,12 @@ public class AdminController : Controller
         ambiente.NamAmb = model.NamAmb.Trim();
         ambiente.DirAmb = model.DirAmb.Trim();
         ambiente.IsAct = model.IsAct;
+        ambiente.SyncIntervalMinutes = model.SyncIntervalMinutes > 0 ? model.SyncIntervalMinutes : 5;
 
         await _db.SaveChangesAsync();
 
         TempData["AdminSuccess"] = true;
-        TempData["AdminMessage"] = $"Ambiente '{ambiente.NamAmb}' actualizado exitosamente.";
+        TempData["AdminMessage"] = $"Ambiente '{ambiente.NamAmb}' actualizado exitosamente (lapso: {ambiente.SyncIntervalMinutes} min).";
 
         return RedirectToAction(nameof(Index));
     }

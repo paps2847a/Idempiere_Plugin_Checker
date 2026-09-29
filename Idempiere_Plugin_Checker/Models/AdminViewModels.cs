@@ -38,6 +38,11 @@ public class AmbienteFormViewModel
     [Display(Name = "Activo")]
     public bool IsAct { get; set; } = true;
 
+    [Required(ErrorMessage = "El lapso de consulta es obligatorio.")]
+    [Range(1, 1440, ErrorMessage = "El lapso debe estar entre 1 y 1440 minutos (24 horas).")]
+    [Display(Name = "Lapso de Consulta / Espera (Minutos)")]
+    public int SyncIntervalMinutes { get; set; } = 5;
+
     // Credenciales iniciales opcionales para la consola OSGi
     [Display(Name = "Usuario OSGi")]
     public string? UsrNam { get; set; }

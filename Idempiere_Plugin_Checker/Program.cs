@@ -27,6 +27,9 @@ builder.Services.AddDbContext<DataContext>(options =>
 // Registrar servicios
 builder.Services.AddScoped<JsonExtractor>();
 
+// Registrar Worker en segundo plano para consultas periódicas
+builder.Services.AddHostedService<PluginSyncWorker>();
+
 var app = builder.Build();
 
 // Asegurar creación de base de datos SQLite y seed inicial

@@ -44,6 +44,12 @@ public class DataContext : DbContext
             entity.Property(e => e.IsAct)
                 .HasDefaultValue(true);
 
+            entity.Property(e => e.SyncIntervalMinutes)
+                .HasDefaultValue(5);
+
+            entity.Property(e => e.LastSyncAt)
+                .IsRequired(false);
+
             entity.HasMany(e => e.Plugins)
                 .WithOne(p => p.Ambiente)
                 .HasForeignKey(p => p.IdAmb)
@@ -161,10 +167,10 @@ public class DataContext : DbContext
         );
 
         // modelBuilder.Entity<Ambiente>().HasData(
-        //     new Ambiente { IdAmb = 1, NamAmb = "Ambiente 1", DirAmb = "https://192.168.6.107:8443", RegDat = fixedDate, IsAct = true },
-        //     new Ambiente { IdAmb = 2, NamAmb = "Ambiente 2", DirAmb = "https://192.168.6.108:8443", RegDat = fixedDate, IsAct = true },
-        //     new Ambiente { IdAmb = 3, NamAmb = "Ambiente 3", DirAmb = "https://192.168.6.109:8443", RegDat = fixedDate, IsAct = true },
-        //     new Ambiente { IdAmb = 4, NamAmb = "Ambiente 4", DirAmb = "https://192.168.6.110:8443", RegDat = fixedDate, IsAct = true }
+        //     new Ambiente { IdAmb = 1, NamAmb = "Ambiente 1", DirAmb = "https://192.168.6.107:8443", RegDat = fixedDate, IsAct = true, SyncIntervalMinutes = 5, LastSyncAt = fixedDate },
+        //     new Ambiente { IdAmb = 2, NamAmb = "Ambiente 2", DirAmb = "https://192.168.6.108:8443", RegDat = fixedDate, IsAct = true, SyncIntervalMinutes = 5, LastSyncAt = fixedDate },
+        //     new Ambiente { IdAmb = 3, NamAmb = "Ambiente 3", DirAmb = "https://192.168.6.109:8443", RegDat = fixedDate, IsAct = true, SyncIntervalMinutes = 5, LastSyncAt = fixedDate },
+        //     new Ambiente { IdAmb = 4, NamAmb = "Ambiente 4", DirAmb = "https://192.168.6.110:8443", RegDat = fixedDate, IsAct = true, SyncIntervalMinutes = 5, LastSyncAt = fixedDate }
         // );
 
         // modelBuilder.Entity<PluginData>().HasData(

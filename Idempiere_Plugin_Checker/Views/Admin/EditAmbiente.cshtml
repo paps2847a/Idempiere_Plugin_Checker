@@ -36,6 +36,17 @@
                         <span asp-validation-for="DirAmb" class="text-danger small"></span>
                     </div>
 
+                    <div class="mb-3">
+                        <label asp-for="SyncIntervalMinutes" class="form-label small fw-semibold text-secondary"></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted"><i class="bi bi-clock-history"></i></span>
+                            <input asp-for="SyncIntervalMinutes" type="number" min="1" max="1440" class="form-control" />
+                            <span class="input-group-text bg-light text-muted">minutos</span>
+                        </div>
+                        <span asp-validation-for="SyncIntervalMinutes" class="text-danger small"></span>
+                        <div class="form-text small">Lapso de espera entre cada consulta automática del worker.</div>
+                    </div>
+
                     <div class="mb-4 form-check form-switch">
                         <input asp-for="IsAct" class="form-check-input" type="checkbox" role="switch" />
                         <label asp-for="IsAct" class="form-check-label small text-secondary">Ambiente activo para monitoreo</label>
