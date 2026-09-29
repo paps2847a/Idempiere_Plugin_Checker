@@ -1,0 +1,73 @@
+@model Idempiere_Plugin_Checker.Models.AmbienteFormViewModel
+@{
+    ViewData["Title"] = "Agregar Ambiente";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="plugin-levitate-card p-4">
+                <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="Volver">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h2 class="h5 fw-bold mb-0">Agregar Nuevo Ambiente</h2>
+                        <small class="text-secondary">Registra una nueva instancia de iDempiere</small>
+                    </div>
+                </div>
+
+                <form asp-action="CreateAmbiente" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="mb-3">
+                        <label asp-for="NamAmb" class="form-label small fw-semibold text-secondary"></label>
+                        <input asp-for="NamAmb" class="form-control" placeholder="ej. Ambiente 5 - Producción" autofocus />
+                        <span asp-validation-for="NamAmb" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DirAmb" class="form-label small fw-semibold text-secondary"></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted"><i class="bi bi-link-45deg"></i></span>
+                            <input asp-for="DirAmb" class="form-control" placeholder="https://192.168.6.107:8443" />
+                        </div>
+                        <span asp-validation-for="DirAmb" class="text-danger small"></span>
+                        <div class="form-text small">Dirección IP/Host y puerto donde corre el web console OSGi.</div>
+                    </div>
+
+                    <div class="mb-4 form-check form-switch">
+                        <input asp-for="IsAct" class="form-check-input" type="checkbox" role="switch" />
+                        <label asp-for="IsAct" class="form-check-label small text-secondary">Ambiente activo para monitoreo</label>
+                    </div>
+
+                    <!-- Credenciales iniciales para consultas OSGi -->
+                    <div class="p-3 bg-light rounded-3 mb-4 border">
+                        <h6 class="fw-bold mb-2 small text-dark d-flex align-items-center gap-1">
+                            <i class="bi bi-key-fill text-primary"></i> Credenciales de Solicitud Iniciales (Opcional)
+                        </h6>
+                        <p class="text-muted small mb-3">Si las agregas ahora, el sistema podrá sincronizar bundles de inmediato.</p>
+
+                        <div class="row g-2">
+                            <div class="col-12 col-sm-6">
+                                <label asp-for="UsrNam" class="form-label small text-secondary mb-1"></label>
+                                <input asp-for="UsrNam" class="form-control form-control-sm" placeholder="ej. prierasystem" />
+                            </div>
+                            <div class="col-12 col-sm-6">
+                                <label asp-for="UsrPass" class="form-label small text-secondary mb-1"></label>
+                                <input asp-for="UsrPass" class="form-control form-control-sm" placeholder="••••••••" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3">Cancelar</a>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                            <i class="bi bi-check-lg"></i> Guardar Ambiente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

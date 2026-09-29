@@ -1,0 +1,54 @@
+@model Idempiere_Plugin_Checker.Models.AmbienteFormViewModel
+@{
+    ViewData["Title"] = "Editar Ambiente";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="plugin-levitate-card p-4">
+                <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                    <a asp-action="Index" class="btn btn-outline-secondary btn-sm rounded-circle p-1" style="width: 32px; height: 32px;" title="Volver">
+                        <i class="bi bi-arrow-left"></i>
+                    </a>
+                    <div>
+                        <h2 class="h5 fw-bold mb-0">Editar Ambiente #@Model.IdAmb</h2>
+                        <small class="text-secondary">Modifica los parámetros de conexión del ambiente</small>
+                    </div>
+                </div>
+
+                <form asp-action="EditAmbiente" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="IdAmb" />
+
+                    <div class="mb-3">
+                        <label asp-for="NamAmb" class="form-label small fw-semibold text-secondary"></label>
+                        <input asp-for="NamAmb" class="form-control" autofocus />
+                        <span asp-validation-for="NamAmb" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DirAmb" class="form-label small fw-semibold text-secondary"></label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white text-muted"><i class="bi bi-link-45deg"></i></span>
+                            <input asp-for="DirAmb" class="form-control" />
+                        </div>
+                        <span asp-validation-for="DirAmb" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-4 form-check form-switch">
+                        <input asp-for="IsAct" class="form-check-input" type="checkbox" role="switch" />
+                        <label asp-for="IsAct" class="form-check-label small text-secondary">Ambiente activo para monitoreo</label>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-3">Cancelar</a>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                            <i class="bi bi-check-lg"></i> Actualizar Ambiente
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

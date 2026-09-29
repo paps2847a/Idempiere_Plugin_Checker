@@ -1,0 +1,87 @@
+using System.ComponentModel.DataAnnotations;
+using Idempiere_Plugin_Checker.Models;
+
+namespace Idempiere_Plugin_Checker.Models;
+
+public class LoginViewModel
+{
+    [Required(ErrorMessage = "El nombre de usuario es obligatorio.")]
+    [Display(Name = "Usuario")]
+    public string Username { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "La contraseña es obligatoria.")]
+    [DataType(DataType.Password)]
+    [Display(Name = "Contraseña")]
+    public string Password { get; set; } = string.Empty;
+
+    [Display(Name = "Recordar sesión")]
+    public bool RememberMe { get; set; }
+
+    public string? ReturnUrl { get; set; }
+}
+
+public class AmbienteFormViewModel
+{
+    public int IdAmb { get; set; }
+
+    [Required(ErrorMessage = "El nombre del ambiente es obligatorio.")]
+    [StringLength(150, ErrorMessage = "El nombre no puede superar los 150 caracteres.")]
+    [Display(Name = "Nombre del Ambiente")]
+    public string NamAmb { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "La URL base del ambiente es obligatoria.")]
+    [StringLength(300, ErrorMessage = "La URL no puede superar los 300 caracteres.")]
+    [Url(ErrorMessage = "Debe ser una URL válida (ej. https://192.168.6.107:8443)")]
+    [Display(Name = "URL del Ambiente (Base URL)")]
+    public string DirAmb { get; set; } = string.Empty;
+
+    [Display(Name = "Activo")]
+    public bool IsAct { get; set; } = true;
+
+    // Credenciales iniciales opcionales para la consola OSGi
+    [Display(Name = "Usuario OSGi")]
+    public string? UsrNam { get; set; }
+
+    [DataType(DataType.Password)]
+    [Display(Name = "Contraseña OSGi")]
+    public string? UsrPass { get; set; }
+}
+
+public class KeyUserFormViewModel
+{
+    public int IdUsr { get; set; }
+
+    [Required(ErrorMessage = "Debes seleccionar un ambiente.")]
+    [Display(Name = "Ambiente")]
+    public int IdAmb { get; set; }
+
+    [Required(ErrorMessage = "El nombre de usuario OSGi es obligatorio.")]
+    [StringLength(100, ErrorMessage = "No puede superar 100 caracteres.")]
+    [Display(Name = "Usuario de Solicitud (OSGi Console)")]
+    public string UsrNam { get; set; } = string.Empty;
+
+    [Required(ErrorMessage = "La contraseña es obligatoria.")]
+    [DataType(DataType.Password)]
+    [StringLength(255)]
+    [Display(Name = "Contraseña de Solicitud")]
+    public string UsrPass { get; set; } = string.Empty;
+
+    [Display(Name = "Activo")]
+    public bool IsAct { get; set; } = true;
+
+    public List<Ambiente> AmbientesDisponibles { get; set; } = new();
+}
+
+public class AdminDashboardViewModel
+{
+    public List<Ambiente> Ambientes { get; set; } = new();
+    public List<KeyUsersAmbiente> KeyUsers { get; set; } = new();
+
+    public int TotalAmbientes => Ambientes.Count;
+    public int TotalAmbientesActivos => Ambientes.Count(a => a.IsAct);
+    public int TotalKeyUsers => KeyUsers.Count;
+    public int TotalPlugins { get; set; }
+
+    public string? Message { get; set; }
+    public bool? MessageSuccess { get; set; }
+}
