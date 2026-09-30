@@ -8,14 +8,17 @@
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
             <h1 class="h3 fw-bold mb-1">Panel de Administración</h1>
-            <p class="text-secondary small mb-0">Gestiona los ambientes iDempiere y los usuarios con los cuales se conectará el sistema.</p>
+            <p class="text-secondary small mb-0">Gestiona los ambientes iDempiere, credenciales de sincronización y administradores del sistema.</p>
         </div>
-        <div class="d-flex gap-2">
+        <div class="d-flex flex-wrap gap-2">
             <a asp-action="CreateAmbiente" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1">
                 <i class="bi bi-plus-circle"></i> Nuevo Ambiente
             </a>
             <a asp-action="CreateKeyUser" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1">
                 <i class="bi bi-person-plus"></i> Nuevo Usuario OSGi
+            </a>
+            <a asp-action="CreateAdminUser" class="btn btn-outline-dark btn-sm rounded-pill px-3 shadow-sm d-flex align-items-center gap-1">
+                <i class="bi bi-shield-plus"></i> Nuevo Administrador
             </a>
         </div>
     </div>
@@ -51,19 +54,18 @@
         </div>
         <div class="col-6 col-lg-3">
             <div class="plugin-levitate-card p-3">
-                <span class="text-muted small fw-semibold text-uppercase">Total Plugins BD</span>
-                <div class="mt-1">
-                    <span class="h3 fw-bold mb-0">@Model.TotalPlugins</span>
+                <span class="text-muted small fw-semibold text-uppercase">Administradores</span>
+                <div class="d-flex align-items-baseline gap-2 mt-1">
+                    <span class="h3 fw-bold mb-0">@Model.TotalAdminUsers</span>
+                    <small class="text-success fw-semibold">(@Model.AdminUsers.Count(a => a.IsAct) activos)</small>
                 </div>
             </div>
         </div>
         <div class="col-6 col-lg-3">
             <div class="plugin-levitate-card p-3">
-                <span class="text-muted small fw-semibold text-uppercase">Estado Sesión</span>
+                <span class="text-muted small fw-semibold text-uppercase">Total Plugins BD</span>
                 <div class="mt-1">
-                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle px-2 py-1">
-                        <i class="bi bi-shield-check"></i> Admin Autenticado
-                    </span>
+                    <span class="h3 fw-bold mb-0">@Model.TotalPlugins</span>
                 </div>
             </div>
         </div>
@@ -92,62 +94,86 @@
                         <th>Última Sync</th>
                         <th>Plugins</th>
                         <th>Estado</th>
-                        <th class="text-end" style="width: 220px;">Acciones</th>
+                        <th class="text-end" style="width: 250px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var amb in Model.Ambientes)
+                    @if (!Model.Ambientes.Any())
                     {
                         <tr>
-                            <td class="fw-bold text-muted">#@amb.IdAmb</td>
-                            <td class="fw-semibold">
-                                <i class="bi bi-hdd-network text-primary me-1"></i> @amb.NamAmb
-                            </td>
-                            <td>
-                                <code class="small text-secondary">@amb.DirAmb</code>
-                            </td>
-                            <td>
-                                <span class="badge bg-light text-dark border">
-                                    <i class="bi bi-clock-history me-1 text-primary"></i> @amb.SyncIntervalMinutes min
-                                </span>
-                            </td>
-                            <td class="small text-muted">
-                                @(amb.LastSyncAt.HasValue ? amb.LastSyncAt.Value.ToString("dd/MM/yyyy HH:mm") : "Pendiente")
-                            </td>
-                            <td>
-                                <span class="badge bg-light text-dark border">
-                                    @(amb.Plugins?.Count ?? 0) plugins
-                                </span>
-                            </td>
-                            <td>
-                                <span class="badge @(amb.IsAct ? "bg-success-subtle text-success border border-success-subtle" : "bg-danger-subtle text-danger border border-danger-subtle") rounded-pill">
-                                    @(amb.IsAct ? "Activo" : "Inactivo")
-                                </span>
-                            </td>
-                            <td class="text-end">
-                                <div class="d-inline-flex gap-1">
-                                    <form asp-action="TestConnection" method="post" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="idAmb" value="@amb.IdAmb" />
-                                        <button type="submit" class="btn btn-outline-success btn-sm rounded-pill" title="Probar conexión y sincronizar">
-                                            <i class="bi bi-arrow-repeat"></i> Probar
-                                        </button>
-                                    </form>
-
-                                    <a asp-action="EditAmbiente" asp-route-id="@amb.IdAmb" class="btn btn-outline-secondary btn-sm rounded-pill" title="Editar">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-
-                                    <form asp-action="ToggleAmbiente" method="post" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="id" value="@amb.IdAmb" />
-                                        <button type="submit" class="btn btn-outline-warning btn-sm rounded-pill" title="@(amb.IsAct ? "Desactivar" : "Activar")">
-                                            <i class="bi @(amb.IsAct ? "bi-pause-circle" : "bi-play-circle")"></i>
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
+                            <td colspan="8" class="text-center text-muted py-3">No hay ambientes registrados.</td>
                         </tr>
+                    }
+                    else
+                    {
+                        @foreach (var amb in Model.Ambientes)
+                        {
+                            <tr>
+                                <td class="fw-bold text-muted">#@amb.IdAmb</td>
+                                <td class="fw-semibold">
+                                    <i class="bi bi-hdd-network text-primary me-1"></i> @amb.NamAmb
+                                </td>
+                                <td>
+                                    <code class="small text-secondary">@amb.DirAmb</code>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-clock-history me-1 text-primary"></i> @amb.SyncIntervalMinutes min
+                                    </span>
+                                </td>
+                                <td class="small text-muted">
+                                    @(amb.LastSyncAt.HasValue ? amb.LastSyncAt.Value.ToString("dd/MM/yyyy HH:mm") : "Pendiente")
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">
+                                        @(amb.Plugins?.Count ?? 0) plugins
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge @(amb.IsAct ? "bg-success-subtle text-success border border-success-subtle" : "bg-danger-subtle text-danger border border-danger-subtle") rounded-pill">
+                                        @(amb.IsAct ? "Activo" : "Inactivo")
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <form asp-action="TestConnection" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="idAmb" value="@amb.IdAmb" />
+                                            <button type="submit" class="btn btn-outline-success btn-sm rounded-pill" title="Probar conexión y sincronizar">
+                                                <i class="bi bi-arrow-repeat"></i> Probar
+                                            </button>
+                                        </form>
+
+                                        <a asp-action="EditAmbiente" asp-route-id="@amb.IdAmb" class="btn btn-outline-secondary btn-sm rounded-pill" title="Editar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+
+                                        <form asp-action="ToggleAmbiente" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@amb.IdAmb" />
+                                            <button type="submit" class="btn btn-outline-warning btn-sm rounded-pill" title="@(amb.IsAct ? "Desactivar" : "Activar")">
+                                                <i class="bi @(amb.IsAct ? "bi-pause-circle" : "bi-play-circle")"></i>
+                                            </button>
+                                        </form>
+
+                                        <button type="button" 
+                                                class="btn btn-outline-danger btn-sm rounded-pill" 
+                                                title="Eliminar ambiente"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#confirmDeleteModal"
+                                                data-action="@Url.Action("DeleteAmbiente", "Admin")"
+                                                data-title="Eliminar Ambiente"
+                                                data-category="Ambiente de iDempiere"
+                                                data-name="@amb.NamAmb"
+                                                data-extra="URL: @amb.DirAmb"
+                                                data-warning="Se eliminarán automáticamente todos sus plugins registrados y las credenciales de solicitud asociadas."
+                                                data-id="@amb.IdAmb">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
@@ -155,7 +181,7 @@
     </div>
 
     <!-- Sección 2: Usuarios de Solicitud (KeyUsersAmbiente) -->
-    <div class="plugin-levitate-card p-4">
+    <div class="plugin-levitate-card p-4 mb-4">
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <h2 class="h5 fw-bold mb-0">Usuarios de Solicitud (Credenciales OSGi)</h2>
@@ -176,13 +202,14 @@
                         <th>Contraseña</th>
                         <th>Estado</th>
                         <th>Fecha Registro</th>
+                        <th class="text-end" style="width: 180px;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
                     @if (!Model.KeyUsers.Any())
                     {
                         <tr>
-                            <td colspan="6" class="text-center text-muted py-3">No hay usuarios de solicitud configurados aún.</td>
+                            <td colspan="7" class="text-center text-muted py-3">No hay usuarios de solicitud configurados aún.</td>
                         </tr>
                     }
                     else
@@ -210,6 +237,38 @@
                                 <td class="small text-muted">
                                     @user.RegDat.ToString("dd/MM/yyyy HH:mm")
                                 </td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <a asp-action="EditKeyUser" asp-route-idUsr="@user.IdUsr" asp-route-idAmb="@user.IdAmb" class="btn btn-outline-secondary btn-sm rounded-pill" title="Editar credenciales">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+
+                                        <form asp-action="ToggleKeyUser" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="idUsr" value="@user.IdUsr" />
+                                            <input type="hidden" name="idAmb" value="@user.IdAmb" />
+                                            <button type="submit" class="btn btn-outline-warning btn-sm rounded-pill" title="@(user.IsAct ? "Desactivar" : "Activar")">
+                                                <i class="bi @(user.IsAct ? "bi-pause-circle" : "bi-play-circle")"></i>
+                                            </button>
+                                        </form>
+
+                                        <button type="button" 
+                                                class="btn btn-outline-danger btn-sm rounded-pill" 
+                                                title="Eliminar usuario"
+                                                data-bs-toggle="modal" 
+                                                data-bs-target="#confirmDeleteModal"
+                                                data-action="@Url.Action("DeleteKeyUser", "Admin")"
+                                                data-title="Eliminar Usuario de Solicitud"
+                                                data-category="Credencial OSGi"
+                                                data-name="@user.UsrNam"
+                                                data-extra="Ambiente: @(user.Ambiente?.NamAmb ?? $"Ambiente {user.IdAmb}")"
+                                                data-warning="El sistema ya no podrá realizar sincronizaciones de plugins en este ambiente con estas credenciales."
+                                                data-idusr="@user.IdUsr"
+                                                data-idamb="@user.IdAmb">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         }
                     }
@@ -217,4 +276,214 @@
             </table>
         </div>
     </div>
+
+    <!-- Sección 3: Administradores del Sistema -->
+    <div class="plugin-levitate-card p-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <h2 class="h5 fw-bold mb-0">Administradores del Sistema</h2>
+                <small class="text-muted">Gestión de cuentas con acceso administrativo al panel</small>
+            </div>
+            <a asp-action="CreateAdminUser" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                <i class="bi bi-person-plus-fill"></i> Nuevo Administrador
+            </a>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th style="width: 70px;">ID</th>
+                        <th>Usuario</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Fecha Registro</th>
+                        <th class="text-end" style="width: 180px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var admin in Model.AdminUsers)
+                    {
+                        var isSelf = string.Equals(admin.UsrNam, Model.CurrentUsername, StringComparison.OrdinalIgnoreCase);
+                        var isPredefinedAdmin = string.Equals(admin.UsrNam, "admin", StringComparison.OrdinalIgnoreCase);
+                        var hasOtherActiveAdmin = Model.AdminUsers.Any(u => u.IdUsr != admin.IdUsr && u.IsAct);
+                        <tr>
+                            <td class="fw-bold text-muted">#@admin.IdUsr</td>
+                            <td class="fw-semibold">
+                                <i class="bi bi-person-badge text-primary me-1"></i> @admin.UsrNam
+                                @if (isSelf)
+                                {
+                                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill ms-1">Tú</span>
+                                }
+                                @if (isPredefinedAdmin)
+                                {
+                                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill ms-1" title="Administrador predefinido por el sistema">Predefinido</span>
+                                }
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border">
+                                    <i class="bi bi-shield-check text-primary me-1"></i> Admin
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge @(admin.IsAct ? "bg-success-subtle text-success border border-success-subtle" : "bg-danger-subtle text-danger border border-danger-subtle") rounded-pill">
+                                    @(admin.IsAct ? "Activo" : "Inactivo")
+                                </span>
+                            </td>
+                            <td class="small text-muted">
+                                @admin.RegDat.ToString("dd/MM/yyyy HH:mm")
+                            </td>
+                            <td class="text-end">
+                                <div class="d-inline-flex gap-1">
+                                    <a asp-action="EditAdminUser" asp-route-id="@admin.IdUsr" class="btn btn-outline-secondary btn-sm rounded-pill" title="Editar credenciales">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    @if (!isSelf)
+                                    {
+                                        <form asp-action="ToggleAdminUser" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@admin.IdUsr" />
+                                            <button type="submit" class="btn btn-outline-warning btn-sm rounded-pill" title="@(admin.IsAct ? "Desactivar administrador" : "Activar administrador")">
+                                                <i class="bi @(admin.IsAct ? "bi-pause-circle" : "bi-play-circle")"></i>
+                                            </button>
+                                        </form>
+
+                                        @if (hasOtherActiveAdmin)
+                                        {
+                                            <button type="button" 
+                                                    class="btn btn-outline-danger btn-sm rounded-pill" 
+                                                    title="@(isPredefinedAdmin ? "Eliminar administrador por defecto (semilla)" : "Eliminar administrador")"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#confirmDeleteModal"
+                                                    data-action="@Url.Action("DeleteAdminUser", "Admin")"
+                                                    data-title="@(isPredefinedAdmin ? "Eliminar Administrador por Defecto" : "Eliminar Administrador")"
+                                                    data-category="@(isPredefinedAdmin ? "Usuario Semilla Inicial" : "Cuenta de Administrador")"
+                                                    data-name="@admin.UsrNam"
+                                                    data-extra="@(isPredefinedAdmin ? "Usuario por defecto (semilla). Se permite eliminar al existir otro administrador activo." : "")"
+                                                    data-warning="Esta cuenta será eliminada permanentemente de la base de datos."
+                                                    data-id="@admin.IdUsr">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-outline-secondary btn-sm rounded-pill opacity-50" disabled 
+                                                    title="No se puede eliminar: debe existir al menos otro administrador activo para acceder al sistema">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-outline-secondary btn-sm rounded-pill opacity-50" disabled title="No puedes desactivar tu propia cuenta">
+                                            <i class="bi bi-pause-circle"></i>
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm rounded-pill opacity-50" disabled title="No puedes eliminarte a ti mismo mientras estás en sesión">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
+
+<!-- Modal Elegante de Confirmación de Eliminación -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+            <!-- Modal Header -->
+            <div class="modal-header border-0 pb-0 pt-4 px-4 align-items-start">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="modal-confirm-icon">
+                        <i class="bi bi-trash3-fill"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-dark mb-0" id="confirmDeleteModalLabel">Confirmar Eliminación</h5>
+                        <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill mt-1" id="confirmDeleteCategory">Acción Irreversible</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="modal-body py-3 px-4">
+                <p class="text-secondary mb-3">
+                    ¿Estás seguro de que deseas eliminar permanentemente el siguiente registro?
+                </p>
+                <div class="p-3 bg-light rounded-3 border border-light-subtle mb-3">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-circle text-danger fs-5"></i>
+                        <span class="fw-bold text-dark fs-6" id="confirmDeleteTargetName">Elemento</span>
+                    </div>
+                    <div class="small text-secondary mt-1 ps-4" id="confirmDeleteTargetExtra" style="display: none;"></div>
+                </div>
+                <div class="alert alert-warning py-2 px-3 rounded-3 small mb-0 d-flex align-items-center gap-2">
+                    <i class="bi bi-info-circle-fill text-warning flex-shrink-0"></i>
+                    <span id="confirmDeleteWarning">Esta acción no se puede deshacer.</span>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer border-0 pt-0 pb-4 px-4 d-flex justify-content-end gap-2">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Cancelar
+                </button>
+                <form id="confirmDeleteForm" method="post" action="">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="confirmDeleteId" value="" />
+                    <input type="hidden" name="idUsr" id="confirmDeleteIdUsr" value="" />
+                    <input type="hidden" name="idAmb" id="confirmDeleteIdAmb" value="" />
+                    <button type="submit" class="btn btn-danger rounded-pill px-4 shadow-sm" id="confirmDeleteSubmitBtn">
+                        <i class="bi bi-trash-fill me-1"></i> Sí, Eliminar
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            const confirmModalEl = document.getElementById('confirmDeleteModal');
+            if (confirmModalEl) {
+                confirmModalEl.addEventListener('show.bs.modal', function (event) {
+                    const button = event.relatedTarget;
+                    if (!button) return;
+
+                    const action = button.getAttribute('data-action') || '';
+                    const title = button.getAttribute('data-title') || 'Confirmar Eliminación';
+                    const category = button.getAttribute('data-category') || 'Acción Irreversible';
+                    const name = button.getAttribute('data-name') || 'Elemento seleccionado';
+                    const extra = button.getAttribute('data-extra') || '';
+                    const warning = button.getAttribute('data-warning') || 'Esta acción no se puede deshacer.';
+                    const id = button.getAttribute('data-id') || '';
+                    const idUsr = button.getAttribute('data-idusr') || '';
+                    const idAmb = button.getAttribute('data-idamb') || '';
+
+                    $('#confirmDeleteModalLabel').text(title);
+                    $('#confirmDeleteCategory').text(category);
+                    $('#confirmDeleteTargetName').text(name);
+
+                    if (extra) {
+                        $('#confirmDeleteTargetExtra').text(extra).show();
+                    } else {
+                        $('#confirmDeleteTargetExtra').hide();
+                    }
+
+                    $('#confirmDeleteWarning').text(warning);
+                    $('#confirmDeleteForm').attr('action', action);
+                    $('#confirmDeleteId').val(id);
+                    $('#confirmDeleteIdUsr').val(idUsr);
+                    $('#confirmDeleteIdAmb').val(idAmb);
+                });
+            }
+        });
+    </script>
+}
